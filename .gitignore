@@ -1,3 +1,22 @@
+# Airflow & Docker specific (1-19)
+logs/
+airflow.db
+.env
+*.log
+*.pid
+
+# OCI Wallet (never push secrets)
+oci_wallet/
+*/oci_wallet/
+*.pem
+*.p12
+*.jks
+*.sso
+*.ora
+
+# IDE configs
+.idea/
+.vscode/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
