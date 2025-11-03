@@ -20,6 +20,3 @@ Airflow DAGs • Corebank Pipelines • Oracle / PostgreSQL • AWS Integratio
  Bronze layer (export jobs)  
  Silver layer (in progress)  
  Gold layer (planned — dashboards, BI, ML models)
-
-
-### 📁 Structureracle and AWS integration.
