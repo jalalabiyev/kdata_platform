@@ -16,12 +16,10 @@ Airflow DAGs • Corebank Pipelines • Oracle / PostgreSQL • AWS Integratio
 - **Dockerized environment** — ready for deployment & scaling  
 - **OCI Wallet + AWS S3 integration**
 
-### 🚀 Roadmap
-✅ Bronze layer (export jobs)  
-🟡 Silver layer (in progress)  
-🔵 Gold layer (planned — dashboards, BI, ML models)
+# Roadmap
+ Bronze layer (export jobs)  
+ Silver layer (in progress)  
+ Gold layer (planned — dashboards, BI, ML models)
 
-
----
 
 ### 📁 Structureracle and AWS integration.
