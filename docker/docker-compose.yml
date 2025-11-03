@@ -1,0 +1,80 @@
+version: "3.8"
+
+x-airflow-common: &airflow-common
+  image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.10.2}
+  env_file:
+    - .env
+  environment: &airflow-common-env
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    AIRFLOW__CORE__FERNET_KEY: ''
+    AWS_ACCESS_KEY_ID: "********"
+    AWS_SECRET_ACCESS_KEY: "*********"
+    AWS_DEFAULT_REGION: "eu-central-1"
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    AIRFLOW__API__AUTH_BACKEND: 'airflow.api.auth.backend.basic_auth'
+    PYTHONPATH: /opt/airflow
+    TNS_ADMIN: /opt/airflow/oci_wallet
+    _PIP_ADDITIONAL_REQUIREMENTS: >-
+      faker
+      oracledb
+      apache-airflow-providers-oracle
+  user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-0}"
+  volumes:
+    - ./dags:/opt/airflow/dags
+    - ./logs:/opt/airflow/logs
+    - ./plugins:/opt/airflow/plugins
+  depends_on:
+    - postgres
+
+services:
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+
+  airflow-init:
+    <<: *airflow-common
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        airflow db migrate
+        airflow users create \
+          --username ***** \
+          --firstname Jalal \
+          --lastname Abiyev \
+          --role Admin \
+          --email admin@example.com \
+          --password *****
+    restart: "no"
+
+  webserver:
+    <<: *airflow-common
+    command: webserver
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+      - /media/jako/datalake:/host_hdd   # HDD mount
+      - /home/jako/Desktop/Data_Solutions/kdata_platform:/opt/airflow/kdata_platform # Jobs
+      - /home/jako/Desktop/Data_Solutions/oracle_db/oci_wallet:/opt/airflow/oci_wallet:ro
+  scheduler:
+    <<: *airflow-common
+    command: scheduler
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+      - /media/jako/datalake:/host_hdd   # HDD mount
+      - /home/jako/Desktop/Data_Solutions/kdata_platform:/opt/airflow/kdata_platform # Jobs
+      - /home/jako/Desktop/Data_Solutions/oracle_db/oci_wallet:/opt/airflow/oci_wallet:ro
+volumes:
+  postgres-db-volume:
